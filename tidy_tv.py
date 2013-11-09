@@ -71,7 +71,7 @@ def main():
 
   # expected episodes to be organised like os
   # 'E:\Downloads\Sorted\[Show Name]\Season x'
-  root = 'G:'
+  root = 'E:\Downloads\Sorted'
   path = os.path.join(root,show,'Season '+season)
 
   os.chdir(path)

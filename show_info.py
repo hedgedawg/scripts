@@ -1,12 +1,13 @@
 #!/usr/bin/python
-import sys,urllib2
+import sys,urllib,urllib2
 import xml.etree.ElementTree as ET
 
 def find_show(show_name):
   ''' 
   find the show id for a show name
   returns the show id for the most relevant show name'''
-  url = 'http://services.tvrage.com/feeds/search.php?show={}'
+  url = 'http://services.tvrage.com/feeds/search.php?show={}'.format(show_name)
+  url = urllib.quote(url, safe="%/:=&?~#+!$,;'@()*[]")
   f = urllib2.urlopen(url.format(show_name))
   root = ET.fromstring(f.read())
   shows = root.findall('show')
