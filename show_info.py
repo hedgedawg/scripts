@@ -8,6 +8,8 @@ def find_show(show_name):
   returns the show id for the most relevant show name'''
   url = 'http://services.tvrage.com/feeds/search.php?show={}'.format(show_name)
   url = urllib.quote(url, safe="%/:=&?~#+!$,;'@()*[]")
+  #print url
+  #sys.exit()
   f = urllib2.urlopen(url.format(show_name))
   root = ET.fromstring(f.read())
   shows = root.findall('show')
@@ -20,6 +22,10 @@ def find_show(show_name):
       print "Choosing", name, started, id
       return id
 
+  print "Unable to find a clear match for", show_name
+  print "Best guess", shows[0].findtext('name')
+  return shows[0].findtext('showid')
+      
 def find_episodes(id, season): 
   ''' 
   for a particular season for a show 

@@ -1,18 +1,25 @@
 #!/usr/bin/python
 import os,re,sys,show_info
 
+def remove(value, deletechars):
+    for c in deletechars:
+        value = value.replace(c,'')
+    return value;
+
 def find_new_filename(filename,series,episodes): 
 
-  regex = '.*[sS](\d+)[eE](\d+).*'
+  regexs = [
+    '.*[sS](\d+)[eE](\d+).*',
   #fail safe regex if format isn't s01e01
-  regex2 = '.*(\d\d)(\d\d).*'
-  regex3 = '.*(\d)x*(\d\d).*'
+    '.*(\d\d)(\d\d).*',
+    '.*Season (\d+) Episode (\d+).*',
+    '.*(\d)x*(\d\d).*'
+  ]
   
   season,episode = 0,0
-  regs = [regex,regex2,regex3]
   ep = ""
-  for reg in regs: 
-    match = re.search(reg,filename)
+  for regex in regexs: 
+    match = re.search(regex,filename)
     if match: 
       season,episode = int(match.group(1)),int(match.group(2))
       break
@@ -22,8 +29,7 @@ def find_new_filename(filename,series,episodes):
     return
 
 
-  episode_name = episodes[episode].replace(' ','.')
-  
+  episode_name = episodes[episode].replace(' ','.').encode("ascii", "ignore")
   ep = 'S{:02d}E{:02d}.{}'.format(season,episode,episode_name) 
     
   series = series.replace(' ','.')
@@ -57,17 +63,11 @@ def confirm_delete(remappings):
     print "Renaming files..."
     for old,new in remappings: 
       if not os.path.exists(new):     
-        os.rename(old,new)
+        os.rename(old,remove(new, '\/:*?"<>|'))
       else: 
         print "Unable to rename", old, "to", new
-
-def main(): 
-
-  if not len(sys.argv) == 3: 
-    sys.exit('Only '+str(len(sys.argv))+' argument')
-    
-  show = sys.argv[1]
-  season = sys.argv[2]
+        
+def rename_season(show,season):
 
   # expected episodes to be organised like os
   # 'E:\Downloads\Sorted\[Show Name]\Season x'
@@ -80,8 +80,7 @@ def main():
   if "Season" in path_tail: 
     _,series = os.path.split(path_head)
   else: 
-    series = path_tail
-  
+    series = path_tail  
   
   episodes = show_info.find_episodes_in_series(series,season)
   
@@ -94,7 +93,17 @@ def main():
     confirm_delete(remappings)
   else: 
     print 'No files to rename in', path
-  
+
+
+def main(): 
+
+  if len(sys.argv) < 3: 
+    sys.exit('Only '+str(len(sys.argv))+' arguments')
+    
+  show = sys.argv[1]
+  seasons = sys.argv[2:]
+  for season in seasons: 
+    rename_season(show,season)  
 
 if __name__ == '__main__':
   main()
