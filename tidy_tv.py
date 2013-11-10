@@ -9,6 +9,7 @@ def remove(value, deletechars):
 def find_new_filename(filename,series,episodes): 
 
   regexs = [
+    '.*[sS](\d+)[eE](\d+)[eE-](\d+).*',
     '.*[sS](\d+)[eE](\d+).*',
   #fail safe regex if format isn't s01e01
     '.*(\d\d)(\d\d).*',
@@ -16,21 +17,33 @@ def find_new_filename(filename,series,episodes):
     '.*(\d)x*(\d\d).*'
   ]
   
-  season,episode = 0,0
+  season,episode,episode2 = 0,0,0
   ep = ""
   for regex in regexs: 
     match = re.search(regex,filename)
     if match: 
       season,episode = int(match.group(1)),int(match.group(2))
+      if len(match.groups()) > 2: 
+        episode2 = int(match.group(3))
       break
   
   if season <= 0: 
     print 'Unable to parse', filename
     return
-
-
+  
   episode_name = episodes[episode].replace(' ','.').encode("ascii", "ignore")
-  ep = 'S{:02d}E{:02d}.{}'.format(season,episode,episode_name) 
+  
+  if episode2 > 0: 
+    episode_name2 = episodes[episode2].replace(' ','.').encode("ascii", "ignore")
+    print episode_name,episode_name2
+    common_prefix = os.path.commonprefix([episode_name,episode_name2])
+    if len(common_prefix) > 0 : 
+      episode_name = common_prefix.rsplit('.',1)[0]
+    else: 
+      episode_name = episode_name + '.' + episode_name2
+    ep = 'S{:02d}E{:02d}E{:02d}.{}'.format(season,episode,episode2,episode_name) 
+  else:     
+    ep = 'S{:02d}E{:02d}.{}'.format(season,episode,episode_name) 
     
   series = series.replace(' ','.')
   new_filename = series + '.' + ep + os.path.splitext(filename)[-1]

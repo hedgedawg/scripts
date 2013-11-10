@@ -30,8 +30,9 @@ def find_episodes(id, season):
   ''' 
   for a particular season for a show 
   returns a dictionary of episode numbers to titles'''
-  url = 'http://services.tvrage.com/feeds/episode_list.php?sid={}'
-  f = urllib2.urlopen(url.format(id))
+  url = 'http://services.tvrage.com/feeds/episode_list.php?sid={}'.format(id)
+  print url
+  f = urllib2.urlopen(url)
   root = ET.fromstring(f.read())
   xpath = "./Episodelist/Season/[@no='{}']".format(season)
   episodes = root.find(xpath).findall('./episode')
