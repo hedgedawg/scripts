@@ -29,6 +29,8 @@ def imdb_rating(title):
   if "Error" not in movie_json:   
     if movie_json['imdbRating'] != "N/A": 
       return float(movie_json['imdbRating'])
+    else: 
+      "Unable to rate", title
   else: 
     print "Unable to find movie", title
   return 0
