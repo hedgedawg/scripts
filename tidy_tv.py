@@ -9,11 +9,12 @@ def remove(value, deletechars):
 def find_new_filename(filename,series,episodes): 
 
   regexs = [
-    '.*[sS](\d+)[eE](\d+)[eE-](\d+).*',
-    '.*[sS](\d+)[eE](\d+).*',
+    '.*[sS](\d+)[eE](\d+)[eE-](\d+).*', # S01E15-E16 or S01E15-16
+    '.*[sS](\d+)[eE](\d+).*', # S01E15
   #fail safe regex if format isn't s01e01
-    '.*(\d\d)(\d\d).*',
-    '.*Season (\d+) Episode (\d+).*',
+    '.*(\d\d)(\d\d).*', # Program0155
+    '.*Season (\d+) Episode (\d+).*', # Season 01 Episode 15
+    '.*(\d)x*(\d\d).*\dx.*(\d\d).*', # 1x15
     '.*(\d)x*(\d\d).*'
   ]
   
@@ -32,7 +33,7 @@ def find_new_filename(filename,series,episodes):
     return
   
   episode_name = episodes[episode].replace(' ','.').encode("ascii", "ignore")
-  
+
   if episode2 > 0: 
     episode_name2 = episodes[episode2].replace(' ','.').encode("ascii", "ignore")
     print episode_name,episode_name2
@@ -84,7 +85,8 @@ def rename_season(show,season):
 
   # expected episodes to be organised like os
   # 'E:\Downloads\Sorted\[Show Name]\Season x'
-  root = 'E:\Downloads\Sorted'
+  #root = 'E:\Downloads\Sorted'
+  root = 'G:'
   path = os.path.join(root,show,'Season '+season)
 
   os.chdir(path)
